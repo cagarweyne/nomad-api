@@ -1,0 +1,88 @@
+name: app-ci-pipeline
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "Dockerfile"
+      - ".github/workflows/**"
+      - ".deploy/**"
+      - "src/**"
+  pull_request:
+    branches:
+      - master
+jobs:
+  test:
+    name: Run api tests with Mocha
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 10
+        uses: actions/setup-node@v2
+        with:
+          node-version: 10
+      - run: npm ci
+      - run: npm test
+  build-and-push-docker-image:
+    name: Build and push docker image
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      # login to docker hub
+      - run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
+      # pull down the service.json file from s3 bucket and add it to the root of the project
+      - run: aws s3 cp s3://fss-service-files/service-account.json service-account.json
+      - run: ls -a
+      - run: cat service-account.json
+      - run: docker build -t cagarweyne/nomad .
+      - run: docker push cagarweyne/nomad
+  build-ami:
+    name: Build AMI image
+    env:
+      PKR_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
+      PKR_VAR_docker_password: ${{ secrets.DOCKER_PASSWORD }}
+    runs-on: ubuntu-latest
+    needs: build-and-push-docker-image
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # OR "2" -> To retrieve the preceding commit and get changed files
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v6.3
+      - run: bash .deploy/scripts/packer-install.sh
+      - run: cd .deploy/packer && packer validate image.pkr.hcl
+      - name: build ami image
+        # if: contains(steps.changed-files.outputs.modified_files, 'image.pkr.hcl') || contains(steps.changed-files.outputs.modified_files, 'setup.sh')
+        run: cd .deploy/packer && packer build image.pkr.hcl
+  infra-terraform:
+    name: stage infrastructure deployment
+    env:
+      TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
+      TF_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
+      TF_VAR_docker_password: ${{ secrets.DOCKER_PASSWORD }}
+      TF_VAR_stripe_secret_key: ${{ secrets.STRIPE_SECRET_KEY }}
+      TF_VAR_web_app_url: ${{ secrets.WEB_APP_URL }}
+      TF_VAR_web_hook_secret: ${{ secrets.WEB_HOOK_SECRET }}
+      # TF_VAR_service_account: ${{ secrets.SERVICE_ACCOUNT }}
+    runs-on: ubuntu-latest
+    needs: build-ami
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.15.3
+      - name: run terraform init to install requried plugins
+        run: cd .deploy/terraform/stage/data-stores/pg && terraform init
+      - name: deploy database on aws
+        run: cd .deploy/terraform/stage/data-stores/pg && terraform apply -auto-approve
+      - name: run terraform init in services dir
+        run: cd .deploy/terraform/stage/services/webserver-cluster && terraform init
+      - name: deploy webserver cluster on aws
+        run: cd .deploy/terraform/stage/services/webserver-cluster && terraform apply -auto-approve
