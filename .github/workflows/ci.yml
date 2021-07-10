@@ -31,6 +31,7 @@ jobs:
     name: Build and push docker image
     runs-on: ubuntu-latest
     needs: test
+    environment: nomad-stage
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
@@ -47,6 +48,7 @@ jobs:
     env:
       PKR_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
       PKR_VAR_docker_password: ${{ secrets.DOCKER_PASSWORD }}
+    environment: nomad-stage
     runs-on: ubuntu-latest
     needs: build-and-push-docker-image
     if: github.ref == 'refs/heads/master'
@@ -70,6 +72,7 @@ jobs:
       TF_VAR_stripe_secret_key: ${{ secrets.STRIPE_SECRET_KEY }}
       TF_VAR_web_app_url: ${{ secrets.WEB_APP_URL }}
       TF_VAR_web_hook_secret: ${{ secrets.WEB_HOOK_SECRET }}
+    environment: nomad-stage
     runs-on: ubuntu-latest
     needs: build-ami
     if: github.ref == 'refs/heads/master'
