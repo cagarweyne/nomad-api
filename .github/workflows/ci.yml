@@ -49,6 +49,7 @@ jobs:
       PKR_VAR_docker_password: ${{ secrets.DOCKER_PASSWORD }}
     runs-on: ubuntu-latest
     needs: build-and-push-docker-image
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
         with:
@@ -59,7 +60,6 @@ jobs:
       - run: bash .deploy/scripts/packer-install.sh
       - run: cd .deploy/packer && packer validate image.pkr.hcl
       - name: build ami image
-        # if: contains(steps.changed-files.outputs.modified_files, 'image.pkr.hcl') || contains(steps.changed-files.outputs.modified_files, 'setup.sh')
         run: cd .deploy/packer && packer build image.pkr.hcl
   infra-terraform:
     name: stage infrastructure deployment
@@ -70,9 +70,9 @@ jobs:
       TF_VAR_stripe_secret_key: ${{ secrets.STRIPE_SECRET_KEY }}
       TF_VAR_web_app_url: ${{ secrets.WEB_APP_URL }}
       TF_VAR_web_hook_secret: ${{ secrets.WEB_HOOK_SECRET }}
-      # TF_VAR_service_account: ${{ secrets.SERVICE_ACCOUNT }}
     runs-on: ubuntu-latest
     needs: build-ami
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
       - uses: hashicorp/setup-terraform@v1
