@@ -137,9 +137,9 @@ data "aws_ami" "nomad_ami" {
 data "aws_iam_role" "logs_role" {
   name = "ec2-cloudwatch"
 }
-
+# "nomad_logs_profile"
 resource "aws_iam_instance_profile" "nomad_log_profile" {
-  name = "nomad_logs_profile"
+  name =  var.log_profile_name
   role = data.aws_iam_role.logs_role.name
 }
 
@@ -177,21 +177,6 @@ resource "aws_lb_target_group"  "asg" {
     unhealthy_threshold = 2
   }
 }
-
-// // get the private subnets ids 
-// data "aws_subnet_ids" "private" {
-//   vpc_id = aws_vpc.vpc.id
-
-//   tags = {
-//     Tier = "Private"
-//   }
-
-//   depends_on = [
-//     aws_subnet.subnet_1_private,
-//     aws_subnet.subnet_2_private,
-//     aws_subnet.subnet_3_private
-//   ]
-// }
 
 // asg resource 
 resource "aws_autoscaling_group" "nomad_asg" {

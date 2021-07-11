@@ -107,7 +107,7 @@ jobs:
         run: cd .deploy/terraform/prod/data-stores/pg && terraform init
       - name: deploy production database on aws
         run: cd .deploy/terraform/prod/data-stores/pg && terraform apply -auto-approve
-      # - name: run terraform init in services dir
-      #   run: cd .deploy/terraform/prod/services/webserver-cluster && terraform init
-      # - name: deploy webserver cluster on aws
-      #   run: cd .deploy/terraform/prod/services/webserver-cluster && terraform apply -auto-approve
+      - name: run terraform init in services dir
+        run: cd .deploy/terraform/prod/services/webserver-cluster && terraform init
+      - name: deploy webserver cluster on aws
+        run: cd .deploy/terraform/prod/services/webserver-cluster && terraform apply -auto-approve

@@ -97,9 +97,12 @@ variable "dns_hosted_zone" {
 }
 
 
-variable "demo_dns_name" {
+variable "dns_name" {
   description = "subdomain name"
-  default     = "dev-api"
+}
+
+variable "log_profile_name" {
+  description = "The logs profile for aws instance"
 }
 
 

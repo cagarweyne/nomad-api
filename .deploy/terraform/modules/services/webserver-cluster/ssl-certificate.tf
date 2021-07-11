@@ -39,7 +39,7 @@ resource "aws_acm_certificate_validation" "cert" {
 # Standard route53 DNS record for "myapp" pointing to an ALB
 resource "aws_route53_record" "myapp" {
   zone_id = data.aws_route53_zone.public.zone_id
-  name    = "${var.demo_dns_name}.${data.aws_route53_zone.public.name}"
+  name    = "${var.dns_name}.${data.aws_route53_zone.public.name}"
   type    = "A"
   alias {
     name                   = aws_lb.nomad_lb.dns_name

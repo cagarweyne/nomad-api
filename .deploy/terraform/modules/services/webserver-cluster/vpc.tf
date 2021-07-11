@@ -73,34 +73,3 @@ resource "aws_route_table_association" "rta_subnet_3_public" {
   subnet_id      = aws_subnet.subnet_3_public.id
   route_table_id = aws_route_table.rtb_public.id
 }
-
-// // private subnets in an all AZ's
-// resource "aws_subnet" "subnet_1_private" {
-//   vpc_id     = aws_vpc.vpc.id
-//   cidr_block = var.cidr_private_subnet_1
-//   availability_zone = data.aws_availability_zones.available.names[0]
-  
-//   tags = {
-//     Tier = "Private"
-//   }
-// }
-
-// resource "aws_subnet" "subnet_2_private" {
-//   vpc_id     = aws_vpc.vpc.id
-//   cidr_block = var.cidr_private_subnet_2
-//   availability_zone = data.aws_availability_zones.available.names[1]
-  
-//   tags = {
-//     Tier = "Private"
-//   }
-// }
-
-// resource "aws_subnet" "subnet_3_private" {
-//   vpc_id     = aws_vpc.vpc.id
-//   cidr_block = var.cidr_private_subnet_3
-//   availability_zone = data.aws_availability_zones.available.names[2]
-  
-//   tags = {
-//     Tier = "Private"
-//   }
-// }

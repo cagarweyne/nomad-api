@@ -28,6 +28,9 @@ module "webserver_cluster" {
   web_hook_secret = var.web_hook_secret
   service_account = var.service_account
 
+  dns_name= "dev-api"
+  log_profile_name= "nomad_logs_profile"
+
   instance_type = "t2.micro"
   min_size = 2
   max_size = 10 
