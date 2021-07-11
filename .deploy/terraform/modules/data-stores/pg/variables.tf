@@ -27,3 +27,8 @@ variable "db_password" {
   description = "The password for teh database"
   type = string
 }
+
+variable "db_security_group_name" {
+  description = "The database security group name"
+  type = string
+}

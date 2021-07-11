@@ -7,7 +7,7 @@ locals {
 }
 
 resource "aws_security_group" "pg_sg" {
-  name = "pg-rds-sg"
+  name = var.db_security_group_name
   description = "RDS (terraform-managed) postgres db"
 
   # Only PG in

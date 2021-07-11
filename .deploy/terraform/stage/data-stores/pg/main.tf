@@ -23,5 +23,6 @@ module "pgsql_data_store" {
   instance_class = "db.t2.micro"
   db_name = "stage_database"
   username = "nomad"
-  db_password = var.db_password 
+  db_password = var.db_password
+  db_security_group_name = "pg-rds-sg"  
 }
