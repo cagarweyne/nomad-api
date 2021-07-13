@@ -96,7 +96,7 @@ jobs:
       TF_VAR_web_hook_secret: ${{ secrets.WEB_HOOK_SECRET }}
     environment: nomad-prod
     runs-on: ubuntu-latest
-    needs: infra-terraform-stage
+    # needs: infra-terraform-stage
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
