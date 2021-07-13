@@ -63,30 +63,30 @@ jobs:
       - run: cd .deploy/packer && packer validate image.pkr.hcl
       - name: build ami image
         run: cd .deploy/packer && packer build image.pkr.hcl
-  infra-terraform-stage:
-    name: stage infrastructure deployment
-    env:
-      TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
-      TF_VAR_stripe_secret_key: ${{ secrets.STRIPE_SECRET_KEY }}
-      TF_VAR_web_app_url: ${{ secrets.WEB_APP_URL }}
-      TF_VAR_web_hook_secret: ${{ secrets.WEB_HOOK_SECRET }}
-    environment: nomad-stage
-    runs-on: ubuntu-latest
-    needs: build-ami
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v2
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: 0.15.3
-      - name: run terraform init to install requried plugins
-        run: cd .deploy/terraform/stage/data-stores/pg && terraform init
-      - name: deploy database on aws
-        run: cd .deploy/terraform/stage/data-stores/pg && terraform destroy -auto-approve
-      - name: run terraform init in services dir
-        run: cd .deploy/terraform/stage/services/webserver-cluster && terraform init
-      - name: deploy webserver cluster on aws
-        run: cd .deploy/terraform/stage/services/webserver-cluster && terraform destroy -auto-approve
+  # infra-terraform-stage:
+  #   name: stage infrastructure deployment
+  #   env:
+  #     TF_VAR_db_password: ${{ secrets.TF_VAR_db_password }}
+  #     TF_VAR_stripe_secret_key: ${{ secrets.STRIPE_SECRET_KEY }}
+  #     TF_VAR_web_app_url: ${{ secrets.WEB_APP_URL }}
+  #     TF_VAR_web_hook_secret: ${{ secrets.WEB_HOOK_SECRET }}
+  #   environment: nomad-stage
+  #   runs-on: ubuntu-latest
+  #   needs: build-ami
+  #   if: github.ref == 'refs/heads/master'
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: hashicorp/setup-terraform@v1
+  #       with:
+  #         terraform_version: 0.15.3
+  #     - name: run terraform init to install requried plugins
+  #       run: cd .deploy/terraform/stage/data-stores/pg && terraform init
+  #     - name: deploy database on aws
+  #       run: cd .deploy/terraform/stage/data-stores/pg && terraform destroy -auto-approve
+  #     - name: run terraform init in services dir
+  #       run: cd .deploy/terraform/stage/services/webserver-cluster && terraform init
+  #     - name: deploy webserver cluster on aws
+  #       run: cd .deploy/terraform/stage/services/webserver-cluster && terraform destroy -auto-approve
   infra-terraform-prod:
     name: production infrastructure deployment
     env:
@@ -107,7 +107,7 @@ jobs:
         run: cd .deploy/terraform/prod/data-stores/pg && terraform init
       - name: deploy production database on aws
         run: cd .deploy/terraform/prod/data-stores/pg && terraform destroy -auto-approve
-      - name: run terraform init in services dir
-        run: cd .deploy/terraform/prod/services/webserver-cluster && terraform init
-      - name: deploy webserver cluster on aws
-        run: cd .deploy/terraform/prod/services/webserver-cluster && terraform destroy -auto-approve
+      # - name: run terraform init in services dir
+      #   run: cd .deploy/terraform/prod/services/webserver-cluster && terraform init
+      # - name: deploy webserver cluster on aws
+      #   run: cd .deploy/terraform/prod/services/webserver-cluster && terraform destroy -auto-approve
