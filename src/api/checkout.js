@@ -5,10 +5,12 @@ async function createCheckoutSession(req, res) {
   const { line_items, customer_email } = req.body;
   // check req body has line items and email
   if (!line_items || !customer_email) {
-    return res.status(400).json({ error: 'missing required session parameters' });
+    return res
+      .status(400)
+      .json({ error: 'missing required session parameters' });
   }
 
-  let session; 
+  let session;
 
   try {
     session = await stripeAPI.checkout.sessions.create({
@@ -18,12 +20,14 @@ async function createCheckoutSession(req, res) {
       customer_email,
       success_url: `${domainUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${domainUrl}/canceled`,
-      shipping_address_collection: { allowed_countries: ['GB', 'US'] }
-    }); 
-    res.status(200).json({ sessionId: session.id, });
+      shipping_address_collection: { allowed_countries: ['GB', 'US'] },
+    });
+    res.status(200).json({ sessionId: session.id });
   } catch (error) {
     console.log(error);
-    res.status(400).json({ error: 'an error occured, unable to create session'});
+    res
+      .status(400)
+      .json({ error: 'an error occured, unable to create session' });
   }
 }
 
