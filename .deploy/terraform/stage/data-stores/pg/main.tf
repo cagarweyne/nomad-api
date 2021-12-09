@@ -20,7 +20,7 @@ module "pgsql_data_store" {
 
   instance_prefix = "stage-pgsql"
   storage = 10
-  instance_class = "db.t2.micro"
+  instance_class = "db.t2.small"
   db_name = "stage_database"
   username = "nomad"
   db_password = var.db_password
