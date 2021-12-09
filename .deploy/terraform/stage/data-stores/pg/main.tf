@@ -19,8 +19,8 @@ module "pgsql_data_store" {
   source = "../../../modules/data-stores/pg"
 
   instance_prefix = "stage-pgsql"
-  storage = 10
-  instance_class = "db.t2.small"
+  storage = 20
+  instance_class = "db.t2.medium"
   db_name = "stage_database"
   username = "nomad"
   db_password = var.db_password
