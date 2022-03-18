@@ -91,16 +91,10 @@ data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
 
   vars = {
-    server_port = var.server_port
-    DB_ADDRESS = data.terraform_remote_state.db.outputs.address 
-    DB_PORT = data.terraform_remote_state.db.outputs.port
-    DB_NAME = data.terraform_remote_state.db.outputs.db_name
-    
+    server_port = var.server_port    
     SECRET_KEY=var.stripe_secret_key
     WEB_APP_URL=var.web_app_url 
     WEB_HOOK_SECRET=var.web_hook_secret 
-    GOOGLE_APPLICATION_CREDENTIALS=var.service_account
-
   }
 }
 

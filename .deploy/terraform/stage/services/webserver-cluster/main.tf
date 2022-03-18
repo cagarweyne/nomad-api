@@ -20,18 +20,14 @@ module "webserver_cluster" {
   source = "../../../modules/services/webserver-cluster"
 
   cluster_name = "webservers-stage"
-  db_remote_state_bucket = "stage-state-fss-1"
-  db_remote_state_key =  "stage/data-stores/mysql/terraform.tfstate"
-
   stripe_secret_key = var.stripe_secret_key
   web_app_url = var.web_app_url
   web_hook_secret = var.web_hook_secret
-  service_account = var.service_account
 
   dns_name= "dev-api"
   log_profile_name= "nomad_logs_profile"
 
   instance_type = "t2.micro"
   min_size = 2
-  max_size = 10 
+  max_size = 3 
 }
