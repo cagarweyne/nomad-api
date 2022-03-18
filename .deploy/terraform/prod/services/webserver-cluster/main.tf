@@ -20,13 +20,9 @@ module "webserver_cluster" {
   source = "../../../modules/services/webserver-cluster"
 
   cluster_name = "webservers-prod"
-  db_remote_state_bucket = "prod-state-fss-1" 
-  db_remote_state_key = "prod/data-stores/pg/terraform.tfstate"
-
   stripe_secret_key = var.stripe_secret_key
   web_app_url = var.web_app_url
   web_hook_secret = var.web_hook_secret
-  service_account = var.service_account
   
   dns_name= "prod-api"
   log_profile_name= "nomad_logs_prod"
