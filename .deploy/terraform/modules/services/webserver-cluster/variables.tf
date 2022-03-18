@@ -30,11 +30,6 @@ variable "cluster_name" {
   type = string
 }
 
-variable "db_remote_state_bucket" {
-  description = "The name of the S3 bucket for the database's remote state bucket"
-  type = string
-}
-
 variable "db_remote_state_key" {
   description = "The path for the database's remote state key in S3 bucket"
   type = string

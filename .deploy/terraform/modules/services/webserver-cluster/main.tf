@@ -75,17 +75,6 @@ resource "aws_lb" "nomad_lb" {
   }
 }
 
-// remote state fetch for db data 
-data "terraform_remote_state" "db" {
-  backend = "s3"
-
-  config = {
-    bucket = var.db_remote_state_bucket
-    key = var.db_remote_state_key
-    region = "us-east-2"
-  }
-}
-
 // user data to be used for launch config 
 data "template_file" "user_data" {
   template = file("${path.module}/user-data.sh")
