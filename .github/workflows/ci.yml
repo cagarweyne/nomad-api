@@ -27,34 +27,34 @@ jobs:
           node-version: '16'
       - run: npm ci
       - run: npm test
-  build-and-push-docker-image:
-    name: Build and push docker image
-    runs-on: ubuntu-latest
-    needs: test
-    environment: nomad-stage
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v2
-      # login to docker hub
-      - run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
+  # build-and-push-docker-image:
+  #   name: Build and push docker image
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   environment: nomad-stage
+  #   if: github.ref == 'refs/heads/master'
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     # login to docker hub
+  #     - run: docker login --username ${{ secrets.DOCKER_USERNAME }} --password ${{ secrets.DOCKER_PASSWORD }}
 
-      - run: docker build -t cagarweyne/nomad .
-      - run: docker push cagarweyne/nomad
-  build-ami:
-    name: Build AMI image
-    env:
-      PKR_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
-      PKR_VAR_docker_password: ${{ secrets.DOCKER_PASSWORD }}
-    environment: nomad-stage
-    runs-on: ubuntu-latest
-    needs: build-and-push-docker-image
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v2
-      - run: bash .deploy/scripts/packer-install.sh
-      - run: cd .deploy/packer && packer validate image.pkr.hcl
-      - name: build ami image
-        run: cd .deploy/packer && packer build image.pkr.hcl
+  #     - run: docker build -t cagarweyne/nomad .
+  #     - run: docker push cagarweyne/nomad
+  # build-ami:
+  #   name: Build AMI image
+  #   env:
+  #     PKR_VAR_docker_username: ${{ secrets.DOCKER_USERNAME }}
+  #     PKR_VAR_docker_password: ${{ secrets.DOCKER_PASSWORD }}
+  #   environment: nomad-stage
+  #   runs-on: ubuntu-latest
+  #   needs: build-and-push-docker-image
+  #   if: github.ref == 'refs/heads/master'
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - run: bash .deploy/scripts/packer-install.sh
+  #     - run: cd .deploy/packer && packer validate image.pkr.hcl
+  #     - name: build ami image
+  #       run: cd .deploy/packer && packer build image.pkr.hcl
   infra-terraform-stage:
     name: stage infrastructure deployment
     env:
@@ -63,7 +63,7 @@ jobs:
       TF_VAR_web_hook_secret: ${{ secrets.WEB_HOOK_SECRET }}
     environment: nomad-stage
     runs-on: ubuntu-latest
-    needs: build-ami
+    # needs: build-ami
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
