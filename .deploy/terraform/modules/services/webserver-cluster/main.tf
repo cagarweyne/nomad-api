@@ -117,31 +117,113 @@ data "aws_ami" "nomad_ami" {
   }
 }
 
-resource "aws_iam_role" "logs_role" {
-  name = "ec2-cloudwatch-3"
+resource "aws_iam_policy" "policy" {
+  name        = "test-policy"
+  description = "A test policy"
+
+  policy = jsonencode({
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "autoscaling:Describe*",
+        "cloudwatch:*",
+        "logs:*",
+        "sns:*",
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:GetRole"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    },
+    {
+    "Effect": "Allow",
+    "Action": "iam:CreateServiceLinkedRole",
+    "Resource": "arn:aws:iam::*:role/aws-service-role/events.amazonaws.com/AWSServiceRoleForCloudWatchEvents*",
+    "Condition": {
+        "StringLike": {
+            "iam:AWSServiceName": "events.amazonaws.com"
+        }
+    }
+   }
+  ]
+})
+}
+
+resource "aws_iam_role" "role" {
+  name = "nomad-role"
+
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
     "Statement": [
         {
             "Effect": "Allow",
             "Action": [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "logs:DescribeLogStreams"
+                "sts:AssumeRole"
             ],
-            "Resource": [
-                "*"
-            ]
+            "Principal": {
+                "Service": [
+                    "ec2.amazonaws.com"
+                ]
+            }
         }
     ]
 })
 }
 
+resource "aws_iam_role_policy_attachment" "attach-policy" {
+  role       = aws_iam_role.role.name
+  policy_arn = aws_iam_policy.policy.arn
+}
+
+// resource "aws_iam_policy" "policy" {
+//   name        = "${random_pet.pet_name.id}-policy"
+//   description = "My test policy"
+
+//   policy = jsonencode({
+//     "Version": "2012-10-17",
+//     "Statement": [
+//         {
+//             "Effect": "Allow",
+//             "Action": [
+//                 "sts:AssumeRole"
+//             ],
+//             "Principal": {
+//                 "Service": [
+//                     "ec2.amazonaws.com"
+//                 ]
+//             }
+//         }
+//     ]
+// })
+// }
+
+// resource "aws_iam_role" "logs_role" {
+//   name = "ec2-cloudwatch-3"
+//   assume_role_policy = jsonencode({
+//     "Version": "2012-10-17",
+//     "Statement": [
+//         {
+//             "Effect": "Allow",
+//             "Action": [
+//                 "logs:CreateLogGroup",
+//                 "logs:CreateLogStream",
+//                 "logs:PutLogEvents",
+//                 "logs:DescribeLogStreams"
+//             ],
+//             "Resource": [
+//                 "*"
+//             ]
+//         }
+//     ]
+// })
+// }
+
 # "nomad_logs_profile"
 resource "aws_iam_instance_profile" "nomad_log_profile" {
   name =  var.log_profile_name
-  role = aws_iam_role.logs_role.name
+  role = aws_iam_role.role.name
 }
 
 // launch config resource for asg 
