@@ -118,20 +118,24 @@ data "aws_ami" "nomad_ami" {
 }
 
 resource "aws_iam_role" "logs_role" {
-  name = "ec2-cloudwatch-2"
+  name = "ec2-cloudwatch-3"
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams"
+            ],
+            "Resource": [
+                "*"
+            ]
         }
-      },
     ]
-  })
+})
 }
 
 # "nomad_logs_profile"
