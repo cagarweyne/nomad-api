@@ -118,7 +118,7 @@ data "aws_ami" "nomad_ami" {
 }
 
 resource "aws_iam_role" "logs_role" {
-  name = "ec2-cloudwatch"
+  name = "ec2-cloudwatch-2"
   assume_role_policy = <<EOF
   {
     "Version": "2012-10-17",
