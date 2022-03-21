@@ -117,9 +117,29 @@ data "aws_ami" "nomad_ami" {
   }
 }
 
-data "aws_iam_role" "logs_role" {
+resource "aws_iam_role" "logs_role" {
   name = "ec2-cloudwatch"
+  assume_role_policy = <<EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
 }
+  EOF
+}
+
 # "nomad_logs_profile"
 resource "aws_iam_instance_profile" "nomad_log_profile" {
   name =  var.log_profile_name
